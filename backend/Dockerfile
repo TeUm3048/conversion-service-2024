@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.11
 
 WORKDIR /app
 
@@ -9,7 +9,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 COPY . .
 
-ENV FLASK_APP app.py
+ENV FLASK_APP /app/app/__init__.py
+ENV FLASK_DEBUG true
 ENV FLASK_ENV development
 ENV FLASK_RUN_PORT 8000
 ENV FLASK_RUN_HOST 0.0.0.0
