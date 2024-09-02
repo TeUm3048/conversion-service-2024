@@ -17,9 +17,9 @@ services:
     command: flask run 
     stop_signal: SIGINT
     environment:
-      DATABASE_URL: DATABASE_URL
-      CELERY_BROKER_URL: CELERY_BROKER_URL
-      CELERY_RESULT_BACKEND: CELERY_RESULT_BACKEND
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
     restart: always
     volumes:
       - type: bind
@@ -53,9 +53,9 @@ services:
       dockerfile: Dockerfile
     command: celery -A app worker --loglevel=info
     environment:
-      DATABASE_URL: DATABASE_URL
-      CELERY_BROKER_URL: CELERY_BROKER_URL
-      CELERY_RESULT_BACKEND: CELERY_RESULT_BACKEND
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
     volumes:
       - type: bind
         source: ./backend
