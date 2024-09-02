@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntrantChoice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+    <!-- Пример создания нового профиля поступающего -->
+    <AddEntrant>
+        <Identification>
+            <IdDocumentType>1</IdDocumentType>
+            <DocName>Паспорт гражданина РФ</DocName>
+            <DocSeries>4509</DocSeries>
+            <DocNumber>123456</DocNumber>
+            <IssueDate>2015-07-01</IssueDate>
+            <DocOrganization>ОВД района Центральный</DocOrganization>
+            <!-- Пример реквизитов для паспорта РФ -->
+            <Fields>
+                <Field>
+                    <SubdivisionCode>770-001</SubdivisionCode>
+                    <IdOksm>643</IdOksm>
+                    <Surname>Иванов</Surname>
+                    <Name>Иван</Name>
+                    <Patronymic>Иванович</Patronymic>
+                </Field>
+            </Fields>
+        </Identification>
+        <Snils>12345678901</Snils>
+        <IdGender>1</IdGender>
+        <Birthday>1990-01-01</Birthday>
+        <Birthplace>г. Москва</Birthplace>
+        <Phone>+7(495)123-45-67</Phone>
+        <Email>entrant@example.com</Email>
+        <IdOksm>643</IdOksm>
+        <FreeEducationReason>
+            <IdFreeEducationReason>1</IdFreeEducationReason>
+            <IdOksmFreeEducationReason>840</IdOksmFreeEducationReason>
+        </FreeEducationReason>
+        <AddressList>
+            <Address>
+                <IsRegistration>true</IsRegistration>
+                <FullAddr>Россия, г. Москва, ул. Пушкина, д. 1</FullAddr>
+                <IdRegion>77</IdRegion>
+                <City>Москва</City>
+            </Address>
+            <Address>
+                <IsRegistration>false</IsRegistration>
+                <FullAddr>Россия, г. Санкт-Петербург, ул. Ленина, д. 5</FullAddr>
+                <IdRegion>78</IdRegion>
+                <City>Санкт-Петербург</City>
+            </Address>
+        </AddressList>
+    </AddEntrant>
+</EntrantChoice>

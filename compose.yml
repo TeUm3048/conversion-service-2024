@@ -14,9 +14,12 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    command: flask run 
     stop_signal: SIGINT
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: DATABASE_URL
+      CELERY_BROKER_URL: CELERY_BROKER_URL
+      CELERY_RESULT_BACKEND: CELERY_RESULT_BACKEND
     restart: always
     volumes:
       - type: bind
@@ -24,6 +27,7 @@ services:
         target: /app
     depends_on:
       - db
+      - redis
 
   proxy:
     image: nginx:alpine
@@ -36,3 +40,26 @@ services:
       - "80:80"
     depends_on:
       - backend
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: always
+
+  celery-worker:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    command: celery -A app worker --loglevel=info
+    environment:
+      DATABASE_URL: DATABASE_URL
+      CELERY_BROKER_URL: CELERY_BROKER_URL
+      CELERY_RESULT_BACKEND: CELERY_RESULT_BACKEND
+    volumes:
+      - type: bind
+        source: ./backend
+        target: /app
+    depends_on:
+      - db
+      - redis

@@ -1,10 +1,10 @@
 import pytest
-from app import app
+from app import flask_app
 
 
 
 @pytest.fixture()
 def client():
-    client = app.test_client()
+    client = flask_app.test_client()
     return client
 

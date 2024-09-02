@@ -1,16 +1,43 @@
 import os
 
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request
+from celery import Celery, Task
+
+from .tasks import add_task
 from .convert import convert
 
 
-def create_app(test_config=None):
+def celery_init_app(app: Flask) -> Celery:
+
+    class ContextTask(Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=ContextTask)
+
+    celery_app.config_from_object(app.config)
+
+    celery_app.set_default()  # Крайне важна строчка, иначе не будет работать
+
+    # Add celery to app.extensions to access it later by app.extensions['celery']
+    app.extensions['celery'] = celery_app
+
+    return celery_app
+
+
+def create_app(test_config=None) -> tuple[Flask, Celery]:
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
         # TODO: Change this to a real database
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        CELERY=dict(
+            broker_url='CELERY_BROKER_URL',
+            result_backend='CELERY_RESULT_BACKEND',
+            task_ignore_result=True
+        )
     )
 
     if test_config is None:
@@ -27,19 +54,21 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    return app
+    app.config.from_prefixed_env()
+
+    celery = celery_init_app(app)
+
+    return app, celery
 
 
-app = create_app()
+flask_app, celery_app = create_app()
 
-app.register_blueprint(convert, url_prefix='/convert')
+flask_app.register_blueprint(convert, url_prefix='/convert')
 
 
-@app.route('/')
+@flask_app.post('/')
 def hello():
-    return "Hello!"
-
-
-print(app.url_map)
-if __name__ == '__main__':
-    app.run()
+    a = request.form.get('a', type=int)
+    b = request.form.get('b', type=int)
+    result = add_task.delay(a, b)
+    return {'task_id': result.id}
