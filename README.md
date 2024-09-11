@@ -10,6 +10,12 @@ POSTGRES_PW=changeit
 POSTGRES_PASSWORD=postgres
 PGADMIN_MAIL=my@email.com
 PGADMIN_PW=changeit
+
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+CELERY_TASK_SERIALIZER=pickle # don't touch this. At celery 5.5.0 pydantic models will be serialized 
+CELERY_RESULT_SERIALIZER=pickle # don't touch this. BUT now it's not working
+CELERY_ACCEPT_CONTENT=["pickle", "json"] # don't touch this. I'm very sad about this
 ```
 
 ## Запуск
