@@ -13,7 +13,7 @@ PGADMIN_PW=changeit
 
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
-CELERY_TASK_SERIALIZER=pickle # don't touch this. At celery 5.5.0 pydantic models will be serialized 
+CELERY_TASK_SERIALIZER=pickle # don't touch this. At celery 5.5.0 pydantic models will be serialized
 CELERY_RESULT_SERIALIZER=pickle # don't touch this. BUT now it's not working
 CELERY_ACCEPT_CONTENT=["pickle", "json"] # don't touch this. I'm very sad about this
 ```
@@ -23,21 +23,37 @@ CELERY_ACCEPT_CONTENT=["pickle", "json"] # don't touch this. I'm very sad about 
 ```bash
 docker-compose up
 ```
+
 ### Выполнить миграцию
 
 ```
 docker-compose exec backend python3.11 -c "from app.database import init_db; init_db()"
 ```
+
 ## Использование
 
-| Метод | URL | Описание |
-| ----- | --- | -------- |
-| POST | /convert/json2xml | Конвертация JSON в XML |
-| POST | /convert/xml2json | Конвертация XML в JSON |
+| Метод | URL               | Описание               |
+| ----- | ----------------- | ---------------------- |
+| POST  | /convert/json2xml | Конвертация JSON в XML |
+| POST  | /convert/xml2json | Конвертация XML в JSON |
 
+## Отслеживание задач
+
+Celery flower доступен по адресу `http://localhost/flower`
+
+## Библиотеки и технологии
+
+- `Flask` — синхронное и уже немного олдовое "ов-но", но всё ещё норм для лайтового backend'а. "А почему бы и нет?"
+- `Celery` — асинхронный батя, который вытаскивает весь трединг, пока Flask раздаёт в одном потоке
+- `Redis` — топовый нереляционный хранилищенский брокер для Celery
+- `PostgreSQL` — просто крутой пацан, который хранит данные
+- `sqlalchemy` — мастер Йода в мире ORM. Без SQL тоже нормально живется
+- `Pydantic` — сидит с бубном парсит (и валидирует) JSON
+- `pydantic_xml` — берёт мудрость XML и адаптирует её под Pydantic. Короче, "XML встречает Python, и они дружат!"
+- `lxml` — тут чисто тестовый XML-краш-тест-драйв. (в основном используется для тестирования конвертации)
+- `docker-compose` — топ-1 мем среди DevOps-ов. "Зачем настраивать вручную, если можно просто собрать всё в один yaml и запустить как пацан в sandbox-е?"
 
 ## From XML to JSON
-
 
 ```mermaid
 classDiagram
@@ -135,7 +151,7 @@ classDiagram
             Name
             Patronymic
             }
-        
+
     }
 
     birthday .. Birthday
