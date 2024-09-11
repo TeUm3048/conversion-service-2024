@@ -2,23 +2,26 @@ from .. import client
 from lxml import etree
 import json
 import pytest
+from app.schemas.add_entrant_json import AddEntrantSchema
 
 
-def test_headers(response):
+def test_valid_json_schema(json_entrant):
+    AddEntrantSchema.model_validate_json(json.dumps(json_entrant))
+
+
+def test_headers(client, json_entrant):
+    response = client.post("/convert/json2xml", data=json.dumps(json_entrant),
+                           content_type='application/json')
     assert response.status_code == 200
-    assert response.content_type == 'application/xml; charset=utf-8'
-    assert response.mimetype == 'application/xml'
+    assert response.content_type == 'application/json'
+    assert response.mimetype == 'application/json'
+
 
 @pytest.mark.skip(reason='not implemented')
-def test_valide_schema(response, xml_schema):
-    assert xml_schema.validate(etree.fromstring(response.data))
-
-
-@pytest.fixture()
-def response(client, json_entrant):
+def test_valid_xml_schema(client, json_entrant, xml_schema):
     response = client.post("/convert/json2xml", data=json_entrant,
                            content_type='application/json')
-    return response
+    assert xml_schema.validate(etree.fromstring(response.data))
 
 
 @pytest.fixture()

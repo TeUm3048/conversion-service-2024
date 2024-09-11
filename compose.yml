@@ -71,14 +71,22 @@ services:
       - db
       - redis
 
-
   celery-flower:
-    build: 
+    build:
       context: backend
       dockerfile: Dockerfile
-    command: ['celery','-A', 'app', 'flower', '--broker=redis://redis:6379/0', '--port=5555', '--persistent=True', '--db=/data/flower']
-    ports:
-      - "5555:5555"
+    command:
+      - 'celery'
+      - '-A'
+      - 'app'
+      - 'flower'
+      - '--broker=redis://redis:6379/0'
+      - '--port=5555'
+      - '--persistent=True'
+      - '--db=/data/flower'
+      - '--url_prefix=flower'
+    expose:
+      - 5555
     environment:
       DATABASE_URL: sqlite:// # ?! WTF? Why do I need this?
       CELERY_BROKER_URL: redis://redis:6379/0

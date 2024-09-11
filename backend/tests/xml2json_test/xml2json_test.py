@@ -4,7 +4,7 @@ import flask
 import pytest
 from lxml import etree
 from .. import client
-from ...app.schemas.add_entrant_xml import EntrantChoiceXMLSchema
+from app.schemas.add_entrant_xml import EntrantChoiceXMLSchema
 
 
 def test_headers(client, xml_valide_pass_rus_entrant):
