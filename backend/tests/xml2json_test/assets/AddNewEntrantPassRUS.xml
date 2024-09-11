@@ -11,20 +11,18 @@
             <DocOrganization>ОВД района Центральный</DocOrganization>
             <!-- Пример реквизитов для паспорта РФ -->
             <Fields>
-                <Field>
                     <SubdivisionCode>770-001</SubdivisionCode>
                     <IdOksm>643</IdOksm>
                     <Surname>Иванов</Surname>
                     <Name>Иван</Name>
                     <Patronymic>Иванович</Patronymic>
-                </Field>
             </Fields>
         </Identification>
         <Snils>12345678901</Snils>
         <IdGender>1</IdGender>
         <Birthday>1990-01-01</Birthday>
         <Birthplace>г. Москва</Birthplace>
-        <Phone>+7(495)123-45-67</Phone>
+        <Phone>+7(800)555-35-35</Phone>
         <Email>entrant@example.com</Email>
         <IdOksm>643</IdOksm>
         <FreeEducationReason>

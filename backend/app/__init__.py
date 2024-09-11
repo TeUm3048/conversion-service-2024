@@ -3,8 +3,10 @@ import os
 from flask import Flask, request
 from celery import Celery, Task
 
-from .tasks import add_task
+from .config import Config
 from .convert import convert
+
+from .database import SessionLocal
 
 
 def celery_init_app(app: Flask) -> Celery:
@@ -29,17 +31,7 @@ def celery_init_app(app: Flask) -> Celery:
 def create_app(test_config=None) -> tuple[Flask, Celery]:
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        # TODO: Change this to a real database
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-        CELERY=dict(
-            broker_url='CELERY_BROKER_URL',
-            result_backend='CELERY_RESULT_BACKEND',
-            task_ignore_result=True
-        )
-    )
-
+    app.config.from_object(Config)
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -66,9 +58,6 @@ flask_app, celery_app = create_app()
 flask_app.register_blueprint(convert, url_prefix='/convert')
 
 
-@flask_app.post('/')
+@flask_app.get('/')
 def hello():
-    a = request.form.get('a', type=int)
-    b = request.form.get('b', type=int)
-    result = add_task.delay(a, b)
-    return {'task_id': result.id}
+    return 'Hello, World!'

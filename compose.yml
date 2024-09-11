@@ -14,12 +14,15 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
-    command: flask run 
+    command: flask run
     stop_signal: SIGINT
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_TASK_SERIALIZER: ${CELERY_TASK_SERIALIZER}
+      CELERY_RESULT_SERIALIZER: ${CELERY_RESULT_SERIALIZER}
+      CELERY_ACCEPT_CONTENT: ${CELERY_ACCEPT_CONTENT}
     restart: always
     volumes:
       - type: bind
@@ -36,7 +39,7 @@ services:
         source: ./proxy/nginx.conf
         target: /etc/nginx/conf.d/default.conf
         read_only: true
-    ports: 
+    ports:
       - "80:80"
     depends_on:
       - backend
@@ -53,9 +56,13 @@ services:
       dockerfile: Dockerfile
     command: celery -A app worker --loglevel=info
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_TASK_SERIALIZER: ${CELERY_TASK_SERIALIZER}
+      CELERY_RESULT_SERIALIZER: ${CELERY_RESULT_SERIALIZER}
+      CELERY_ACCEPT_CONTENT: ${CELERY_ACCEPT_CONTENT}
+      C_FORCE_ROOT: true
     volumes:
       - type: bind
         source: ./backend
@@ -63,3 +70,27 @@ services:
     depends_on:
       - db
       - redis
+
+
+  celery-flower:
+    build: 
+      context: backend
+      dockerfile: Dockerfile
+    command: ['celery','-A', 'app', 'flower', '--broker=redis://redis:6379/0', '--port=5555', '--persistent=True', '--db=/data/flower']
+    ports:
+      - "5555:5555"
+    environment:
+      DATABASE_URL: sqlite:// # ?! WTF? Why do I need this?
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_TASK_SERIALIZER: ${CELERY_TASK_SERIALIZER}
+      CELERY_RESULT_SERIALIZER: ${CELERY_RESULT_SERIALIZER}
+      CELERY_ACCEPT_CONTENT: ${CELERY_ACCEPT_CONTENT}
+    depends_on:
+      - redis
+      - celery-worker
+    volumes:
+      - flower_data:/data
+      - ./backend/app/config.py:/app/config.py
+volumes:
+  flower_data:

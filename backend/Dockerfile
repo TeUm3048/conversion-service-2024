@@ -2,6 +2,8 @@ FROM python:3.11
 
 WORKDIR /app
 
+RUN apt-get -y update && apt-get upgrade -y 
+
 COPY requirements.txt .
 
 RUN --mount=type=cache,target=/root/.cache/pip \

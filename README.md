@@ -17,7 +17,11 @@ PGADMIN_PW=changeit
 ```bash
 docker-compose up
 ```
+### Выполнить миграцию
 
+```
+docker-compose exec backend python3.11 -c "from app.database import init_db; init_db()"
+```
 ## Использование
 
 | Метод | URL | Описание |
